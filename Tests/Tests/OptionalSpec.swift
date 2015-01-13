@@ -2,10 +2,6 @@ import Quick
 import Nimble
 import Runes
 
-private func pure<A>(a: A) -> A? {
-    return .Some(a)
-}
-
 private func pureAppend(x: String) -> String? {
     return pure(append(x))
 }
@@ -50,8 +46,8 @@ class OptionalSpec: QuickSpec {
                 // pure f <*> pure x = pure (f x)
                 it("obeys the homomorphism law") {
                     let foo = "foo"
-                    let lhs = pure(append) <*> pure(foo)
-                    let rhs = pure(append(foo))
+                    let lhs: String? = pure(append) <*> pure(foo)
+                    let rhs: String? = pure(append(foo))
 
                     expect(lhs).to(equal(rhs))
                 }
@@ -59,8 +55,8 @@ class OptionalSpec: QuickSpec {
                 // u <*> pure y = pure ($ y) <*> u
                 it("obeys the interchange law") {
                     let foo = "foo"
-                    let lhs = pure(append) <*> pure(foo)
-                    let rhs = pure({ $0(foo) }) <*> pure(append)
+                    let lhs: String? = pure(append) <*> pure(foo)
+                    let rhs: String? = pure({ $0(foo) }) <*> pure(append)
 
                     expect(lhs).to(equal(rhs))
                 }
