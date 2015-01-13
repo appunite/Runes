@@ -2,14 +2,6 @@ import Quick
 import Nimble
 import Runes
 
-private func pureAppend(x: String) -> String? {
-    return pure(append(x))
-}
-
-private func purePrepend(x: String) -> String? {
-    return pure(prepend(x))
-}
-
 class OptionalSpec: QuickSpec {
     override func spec() {
         describe("Optional") {
@@ -75,7 +67,7 @@ class OptionalSpec: QuickSpec {
                 // return x >>= f = f x
                 it("obeys the left identity law") {
                     let foo = "foo"
-                    let lhs = pure(foo) >>- pureAppend
+                    let lhs: String? = pure(foo) >>- compose(append, pure)
                     let rhs = append(foo)
 
                     expect(lhs).to(equal(rhs))
@@ -93,8 +85,8 @@ class OptionalSpec: QuickSpec {
                 // (m >>= f) >>= g = m >>= (\x -> f x >>= g)
                 it("obeys the associativity law") {
                     let optional = Optional.Some("foo")
-                    let lhs = (optional >>- pureAppend) >>- purePrepend
-                    let rhs = optional >>- { x in pureAppend(x) >>- purePrepend }
+                    let lhs = (optional >>- compose(append, pure)) >>- compose(prepend, pure)
+                    let rhs = optional >>- { x in compose(append, pure)(x) >>- compose(prepend, pure) }
 
                     expect(lhs).to(equal(rhs))
                 }

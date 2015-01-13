@@ -2,14 +2,6 @@ import Quick
 import Nimble
 import Runes
 
-private func pureAppend(x: String) -> [String] {
-    return pure(append(x))
-}
-
-private func purePrepend(x: String) -> [String] {
-    return pure(prepend(x))
-}
-
 class ArraySpec: QuickSpec {
     override func spec() {
         describe("Array") {
@@ -75,8 +67,8 @@ class ArraySpec: QuickSpec {
                 // return x >>= f = f x
                 it("obeys the left identity law") {
                     let foo = "foo"
-                    let lhs = pure(foo) >>- pureAppend
-                    let rhs = pureAppend(foo)
+                    let lhs: [String] = pure(foo) >>- compose(append, pure)
+                    let rhs: [String] = compose(append, pure)(foo)
 
                     expect(lhs).to(equal(rhs))
                 }
@@ -93,8 +85,8 @@ class ArraySpec: QuickSpec {
                 // (m >>= f) >>= g = m >>= (\x -> f x >>= g)
                 it("obeys the associativity law") {
                     let array = ["foo"]
-                    let lhs = (array >>- pureAppend) >>- purePrepend
-                    let rhs = array >>- { x in pureAppend(x) >>- purePrepend }
+                    let lhs = (array >>- compose(append, pure)) >>- compose(prepend, pure)
+                    let rhs = array >>- { x in compose(append, pure)(x) >>- compose(prepend, pure) }
 
                     expect(lhs).to(equal(rhs))
                 }
